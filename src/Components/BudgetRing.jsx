@@ -1,7 +1,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const COLORS = ["#2563eb", "#f59e0b", "#10b981", "#a855f7", "#ef4444"];
-const REMAINING_COLOR = "#e5e7eb"; 
+const REMAINING_COLOR = "#e5e7eb";
 
 function formatEUR(n) {
   return new Intl.NumberFormat("fr-FR", {
@@ -53,47 +53,78 @@ export default function BudgetRing({ summary }) {
         </div>
       </div>
 
-      <div className="mt-6 space-y-3">
-        {summary.categories.map((cat, index) => {
-          const percent =
-            summary.variableBudget > 0
-              ? Math.round((cat.value / summary.variableBudget) * 100)
-              : 0;
+      <div className="mt-6 space-y-4">
+  {summary.categories.map((cat, index) => {
+    const percent =
+      summary.variableBudget > 0
+        ? Math.min(100, Math.round((cat.value / summary.variableBudget) * 100))
+        : 0;
 
-          return (
-            <div key={cat.name} className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-3">
-                <span
-                  className="h-3 w-3 rounded-full"
-                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                />
-                <span className="text-gray-700">{cat.name}</span>
-              </div>
-
-              <div className="text-right">
-                <div className="font-medium">{formatEUR(cat.value)}</div>
-                <div className="text-xs text-gray-400">{percent}%</div>
-              </div>
-            </div>
-          );
-        })}
-
-        <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-100">
+    return (
+      <div key={cat.name}>
+        <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-3">
-            <span className="h-3 w-3 rounded-full" style={{ backgroundColor: REMAINING_COLOR }} />
-            <span className="text-gray-700">Restant</span>
+            <span
+              className="h-3 w-3 rounded-full"
+              style={{ backgroundColor: COLORS[index % COLORS.length] }}
+            />
+            <span className="text-gray-700">{cat.name}</span>
           </div>
+
           <div className="text-right">
-            <div className="font-medium">{formatEUR(remainingForRing)}</div>
+            <div className="font-medium">
+              {formatEUR(cat.value)}
+            </div>
             <div className="text-xs text-gray-400">
-              {summary.variableBudget > 0
-                ? Math.round((remainingForRing / summary.variableBudget) * 100)
-                : 0}
-              %
+              {percent}%
             </div>
           </div>
         </div>
+
+        <div className="mt-2 h-2 w-full rounded-full bg-gray-100">
+          <div
+            className="h-2 rounded-full transition-all duration-500"
+            style={{
+              width: `${percent}%`,
+              backgroundColor: COLORS[index % COLORS.length],
+            }}
+          />
+        </div>
       </div>
+    );
+  })}
+
+  <div className="pt-3 border-t border-gray-100">
+    <div className="flex items-center justify-between text-sm">
+      <div className="flex items-center gap-3">
+        <span
+          className="h-3 w-3 rounded-full"
+          style={{ backgroundColor: REMAINING_COLOR }}
+        />
+        <span className="text-gray-700">Restant</span>
+      </div>
+
+      <div className="text-right">
+        <div className="font-medium">
+          {formatEUR(remainingForRing)}
+        </div>
+      </div>
+    </div>
+
+    <div className="mt-2 h-2 w-full rounded-full bg-gray-100">
+      <div
+        className="h-2 rounded-full bg-gray-300 transition-all duration-500"
+        style={{
+          width: `${
+            summary.variableBudget > 0
+              ? Math.round((remainingForRing / summary.variableBudget) * 100)
+              : 0
+          }%`,
+        }}
+      />
+    </div>
+  </div>
+</div>
     </div>
   );
 }
